@@ -2,7 +2,7 @@
 
 from schemas import CategoryBase, CategoryDisplay,CategoryList
 
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter,Depends,Request
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db import db_category
@@ -19,16 +19,27 @@ def create_category(request : CategoryBase,db:Session = Depends(get_db)):
      return db_category.create_category(db,request)
 
 @router.get('/',response_model=CategoryList)
-def get_all_categories(db:Session = Depends(get_db)):
+def get_all_categories(request:Request,db:Session = Depends(get_db)):
     categories= db_category.get_all_categories(db)
+    # return {
+    #     "categories": [
+    #         {
+    #             "category_id": category.category_id,
+    #             "category_code": category.category_code,
+    #             "category_name": category.category_name,
+    #             "image_url": category.image_url
+    #         } for category in categories
+    #     ]
+    # }
+    for c in categories:
+        if c.image_url and not c.image_url.startswith("http"):
+            c.image_url = (
+                str(request.base_url)
+                + f"media/categories/{c.image_url}"
+            )
+
     return {
-        "categories": [
-            {
-                "category_id": category.category_id,
-                "category_code": category.category_code,
-                "category_name": category.category_name
-            } for category in categories
-        ]
+        "categories": categories
     }
 @router.get('/{id}',response_model=CategoryDisplay)   
 def get_category(id:int,db:Session = Depends(get_db)):

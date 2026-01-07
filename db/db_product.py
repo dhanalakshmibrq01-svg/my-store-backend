@@ -14,6 +14,7 @@ def create_product(db: Session, request: ProductBase):
     # Create the product
     new_product = DbProduct(
         product_name=request.product_name,
+        description=request.description,
         price=request.price,
         stock=request.stock,
         image_url=request.image_url,
@@ -28,6 +29,30 @@ def create_product(db: Session, request: ProductBase):
     # Attach category object for nested response
     # new_product.category = category
     return new_product
+
+# def search_product_by_name(db: Session, keyword: str):
+#     return db.query(DbProduct).filter(
+#         DbProduct.product_name.ilike(f"%{keyword}%")
+#     ).all()
+def search_product_by_name(db: Session, keyword: str):
+    keyword = keyword.strip()
+    if not keyword:
+        return []
+
+    
+    starts_with = db.query(DbProduct).filter(
+        DbProduct.product_name.ilike(f"{keyword}%")
+    ).all()
+
+    
+    contains = db.query(DbProduct).filter(
+        DbProduct.product_name.ilike(f"%{keyword}%"),
+        ~DbProduct.product_name.ilike(f"{keyword}%")  
+    ).all()
+
+    
+    return starts_with + contains
+   
 
 def get_all_products(db:Session):
     return db.query(DbProduct).all()    
@@ -51,6 +76,7 @@ def update_product(db: Session, id: int, request: ProductBase):
         raise HTTPException(status_code=404, detail="Category not found")    
 
     product.product_name = request.product_name
+    product.description = request.description
     product.price = request.price
     product.stock = request.stock
     product.image_url = request.image_url
@@ -64,6 +90,7 @@ def update_product(db: Session, id: int, request: ProductBase):
     return {
         "product_id": product.product_id,
         "product_name": product.product_name,
+        "description":product.description,
         "price": product.price,
         "stock": product.stock,
         "image_url": product.image_url,
@@ -71,7 +98,8 @@ def update_product(db: Session, id: int, request: ProductBase):
         "category": {
             "category_id": category.category_id,
             "category_code":category.category_code,
-            "category_name":category.category_name
+            "category_name":category.category_name,
+            "image_url":category.image_url
         }
     }
 def delete_product(db:Session,id:int):
@@ -84,6 +112,15 @@ def delete_product(db:Session,id:int):
     db.delete(product)
     db.commit()
     return 'ok'     
+
+def get_products_by_category(db: Session, category_id: int):
+    category = db.query(DbCategory).filter(DbCategory.category_id == category_id).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    return db.query(DbProduct).filter(DbProduct.category_id == category_id).all()
+
+
 
 
 

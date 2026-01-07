@@ -23,18 +23,20 @@ class DbCategory(Base):
     category_id = Column(Integer,primary_key=True,index=True)
     category_code = Column(String)
     category_name = Column(String)
+    image_url = Column(String, nullable=True)
     products = relationship("DbProduct", back_populates="category")
 
 class DbProduct(Base):
     __tablename__ = 'products'
     product_id = Column(Integer, primary_key=True, index=True)
     product_name = Column(String)
+    description = Column(String)
     price = Column(Float)  
     stock = Column(Integer)
     image_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Define Foreign Key relation 
+    
     category_id = Column(Integer, ForeignKey("category.category_id"))
     category = relationship("DbCategory", back_populates="products")
 

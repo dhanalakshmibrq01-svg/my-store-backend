@@ -23,7 +23,9 @@ app.include_router(role.router)
 app.include_router(category.router)
 app.include_router(product.router)
 
+#models.Base.metadata.drop_all(engine)
 models.Base.metadata.create_all(engine) 
+
 
 # origins = [
 #     "http://localhost:3000",  # frontend URL

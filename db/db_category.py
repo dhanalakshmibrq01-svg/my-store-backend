@@ -7,7 +7,8 @@ from fastapi import HTTPException,status
 def create_category(db: Session, request: CategoryBase):
     new_category = DbCategory(
         category_code=request.category_code,
-        category_name = request.category_name
+        category_name = request.category_name,
+        image_url=request.image_url
     )
     db.add(new_category)
     db.commit()
@@ -36,14 +37,15 @@ def update_category(db: Session, id: int, request: CategoryBase):
         )
     category.category_code = request.category_code
     category.category_name = request.category_name
-
+    category.image_url = request.image_url
     db.commit()
     db.refresh(category)
 
     return {
         "category_id": category.category_id,
         "category_code": category.category_code,
-        "category_name": category.category_name
+        "category_name": category.category_name,
+        "image_url": category.image_url
     }
 
 def delete_category(db:Session,id:int):
