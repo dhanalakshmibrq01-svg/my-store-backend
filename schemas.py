@@ -81,3 +81,21 @@ class ProductByCategory(BaseModel):
 
     class Config:
         orm_mode = True
+
+class UserBase(BaseModel):
+    username : str
+    password : str    
+    
+
+class UserDisplay(BaseModel):
+    user_id: int
+    username: str
+    is_active: str
+    class Config:
+        orm_mode = True
+
+class SystemRoleDisplay(BaseModel):
+    sr_id: int
+    sr_name: str
+    class Config:
+        orm_mode = True        

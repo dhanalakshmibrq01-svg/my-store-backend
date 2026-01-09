@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI
  #from enum import Enum #from typing import Optional
-from router import employee,department,role,category,product,file
+from router import employee,department,role,category,product,file,user
 from fastapi.staticfiles import StaticFiles 
 from db import models
 # from fastapi.responses import JSONResponse
@@ -15,7 +15,7 @@ app=FastAPI()
 def index():
     return 'product management system'
 
-
+app.include_router(user.router)
 app.include_router(file.router)
 app.include_router(employee.router)
 app.include_router(department.router)

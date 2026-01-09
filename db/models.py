@@ -40,6 +40,19 @@ class DbProduct(Base):
     category_id = Column(Integer, ForeignKey("category.category_id"))
     category = relationship("DbCategory", back_populates="products")
 
+class DbUser(Base):
+    __tablename__ = 'login'    
+    user_id = Column(Integer,primary_key=True,index=True)
+    username = Column(String)
+    password = Column(String)
+    is_active = Column(String(3), default="YES")
+
+class SystemRole(Base):
+    __tablename__ = "system_role"
+    sr_id = Column(Integer, primary_key=True)        
+    sr_name = Column(String(50),nullable=False, unique=True)
+
+
 #class DbEmployee(Base):
     #__tablename__='employees'
     #emp_id=Column(Integer,primary_key=True,index=True)
