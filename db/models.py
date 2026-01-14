@@ -47,10 +47,25 @@ class DbUser(Base):
     password = Column(String)
     is_active = Column(String(3), default="YES")
 
+    roles = relationship("UserRole", back_populates="user")
+
 class SystemRole(Base):
     __tablename__ = "system_role"
     sr_id = Column(Integer, primary_key=True)        
     sr_name = Column(String(50),nullable=False, unique=True)
+
+    users = relationship("UserRole", back_populates="role")
+
+class UserRole(Base):
+    __tablename__ = "user_role"
+
+    user_role_id = Column(Integer, primary_key=True, index=True) 
+    user_id = Column(Integer, ForeignKey("login.user_id"), nullable=False)  
+    sr_id = Column(Integer, ForeignKey("system_role.sr_id"), nullable=False) 
+    created_on = Column(DateTime, default=datetime.utcnow) 
+    
+    user = relationship("DbUser", back_populates="roles")      
+    role = relationship("SystemRole", back_populates="users")    
 
 
 #class DbEmployee(Base):

@@ -98,4 +98,32 @@ class SystemRoleDisplay(BaseModel):
     sr_id: int
     sr_name: str
     class Config:
-        orm_mode = True        
+        orm_mode = True  
+
+class UserRoleBase(BaseModel):
+    user_id: int
+    sr_id: int
+
+
+class UserRoleDisplay(BaseModel):
+    user_role_id: int
+    user: UserDisplay  
+    role: SystemRoleDisplay 
+    
+    created_on: datetime
+
+    class Config:
+        orm_mode = True
+
+class UserRoleResponse(BaseModel):
+    data: List[UserRoleDisplay]
+    current_user: UserBase
+
+# class UserRoleNestedDisplay(BaseModel):
+#     user_role_id: int
+#     user: UserDisplay  
+#     role: SystemRoleDisplay  
+#     created_on: datetime
+
+#     class Config:
+#         orm_mode = True              

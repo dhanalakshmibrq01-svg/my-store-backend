@@ -5,3 +5,4 @@ sqlalchemy
 python-multipart
 passlib
 bcrypt==4.3.0
+python-jose
