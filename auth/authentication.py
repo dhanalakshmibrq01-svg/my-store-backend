@@ -20,13 +20,33 @@ def get_token(request: OAuth2PasswordRequestForm = Depends(),db:Session = Depend
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid credentials")
     if not Hash.verify(user.password,request.password):   
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Incorrect password")   
+    user_role = (
+        db.query(models.UserRole)
+        .filter(models.UserRole.user_id == user.user_id)
+        .first()
+    )
+    if not user_role:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User has no role assigned"
+        )
+
+   
+    # if user.is_active != "YES":
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail="User is not active"
+    #     )
 
     current_logged_in_ids.add(user.user_id)
-    
-    
     set_active_user(db)
     # set_active_user(db, user.user_id)
-    access_token = token_utils.create_access_token(data={'sub':user.username})
+    access_token = token_utils.create_access_token(
+        data={
+            'sub':user.username,
+             "user_id": user.user_id,
+             "system_role_id": user_role.sr_id
+            })
     
 
     return{
@@ -34,6 +54,7 @@ def get_token(request: OAuth2PasswordRequestForm = Depends(),db:Session = Depend
         'token_type':'bearer',
         'user_id':user.user_id,
         'username':user.username,
+        "system_role_id": user_role.sr_id,
         "is_active": "YES"
 
     }
