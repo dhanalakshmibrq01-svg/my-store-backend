@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 from pydantic import BaseModel,Field
-from typing import List
+from typing import List,Optional
 from datetime import datetime 
 
 class DepartmentBase(BaseModel):
@@ -119,11 +119,24 @@ class UserRoleResponse(BaseModel):
     data: List[UserRoleDisplay]
     current_user: UserBase
 
-# class UserRoleNestedDisplay(BaseModel):
-#     user_role_id: int
-#     user: UserDisplay  
-#     role: SystemRoleDisplay  
-#     created_on: datetime
+class EmployeeBase(BaseModel):
+    name: str
+    phone_no: str
+    user_id: int
+    role_id: int
+    department_id: int
 
-#     class Config:
-#         orm_mode = True              
+class EmployeeDisplay(BaseModel):
+    emp_id: int
+    name: str
+    phone_no: str
+    user: UserDisplay
+    role: RoleDisplay
+    department: DepartmentDisplay
+
+    class Config:
+        orm_mode = True
+
+class EmployeeUpdate(BaseModel):
+    name: Optional[str] = None
+    phone_no: Optional[str] = None        

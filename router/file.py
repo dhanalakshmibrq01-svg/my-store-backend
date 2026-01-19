@@ -25,3 +25,15 @@ def upload_file(request:Request,upload_file: UploadFile = File(...)):
     image_url = str(request.base_url) + f"media/products/{filename}"
     return {"image_url": image_url}
 
+
+@router.get("/hero-image")
+def get_hero_image(request: Request):
+    HERO_IMAGE_NAME = "hero.webp"
+    path = f"media/products/{HERO_IMAGE_NAME}"
+
+    if not os.path.exists(path):
+        return {"detail": "Hero image not found"}
+
+    image_url = str(request.base_url) + f"media/products/{HERO_IMAGE_NAME}"
+    return {"image_url": image_url}    
+

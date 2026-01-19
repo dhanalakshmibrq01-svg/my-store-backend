@@ -11,12 +11,14 @@ class DbDepartment(Base):
     id = Column(Integer,primary_key=True,index=True)
     code = Column(String)
     name = Column(String)
-
+    employees = relationship("DbEmployee", back_populates="department")
+    
 class DbRole(Base):
     __tablename__='role' 
     role_id = Column(Integer,primary_key=True,index=True)
     role_code = Column(String)
     role_name = Column(String)
+    employees = relationship("DbEmployee", back_populates="role")
 
 class DbCategory(Base):
     __tablename__ = 'category'
@@ -48,7 +50,7 @@ class DbUser(Base):
     is_active = Column(String(3), default="YES")
 
     roles = relationship("UserRole", back_populates="user")
-
+    employees = relationship("DbEmployee", back_populates="user")
 class SystemRole(Base):
     __tablename__ = "system_role"
     sr_id = Column(Integer, primary_key=True)        
@@ -68,10 +70,19 @@ class UserRole(Base):
     role = relationship("SystemRole", back_populates="users")    
 
 
-#class DbEmployee(Base):
-    #__tablename__='employees'
-    #emp_id=Column(Integer,primary_key=True,index=True)
-    #fullname=Column(String)
-    #email=Column(String)
-    #dept_id=Column(Integer,ForeignKey('departments.dept_id'))
+class DbEmployee(Base):
+    __tablename__ = "employees"
 
+    emp_id = Column(Integer, primary_key=True, index=True)
+
+    name = Column(String, nullable=False)
+    phone_no = Column(String, nullable=False)
+    
+    user_id = Column(Integer, ForeignKey("login.user_id"), nullable=False)
+    role_id = Column(Integer, ForeignKey("role.role_id"), nullable=False)
+    department_id = Column(Integer, ForeignKey("department.id"), nullable=False)
+
+   
+    user = relationship("DbUser",back_populates="employees")
+    role = relationship("DbRole",back_populates="employees")
+    department = relationship("DbDepartment",back_populates="employees")

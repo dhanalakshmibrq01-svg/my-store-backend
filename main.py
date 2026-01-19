@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI
  #from enum import Enum #from typing import Optional
-from router import employee,department,role,category,product,file,user,system_role,userrole
+from router import employee,department,role,category,product,file,user,system_role,userrole,employee
 from fastapi.staticfiles import StaticFiles 
 from db import models
 from auth import authentication

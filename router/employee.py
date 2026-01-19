@@ -1,47 +1,42 @@
 
+from schemas import EmployeeBase,EmployeeDisplay,EmployeeUpdate
+from fastapi import APIRouter,Depends,HTTPException,status
+from sqlalchemy.orm import Session
+from db.database import get_db
+from db import db_employee
+from typing import List
 
-from fastapi import APIRouter, Body, HTTPException
-
-router = APIRouter(
-    prefix="/employee",
-    tags=["employee"]
+router=APIRouter(
+    prefix='/employee',
+    tags=['employee']
 )
 
-# Temporary in-memory storage
-employees = []
+#create dept
 
-# CREATE employee
-@router.post("/")
-def create_employee(
-    fullname: str = Body(...),
-    email: str = Body(...),
-    dept_id: int = Body(...)
-):
-    employee = {
-        "emp_id": len(employees) + 1,
-        "fullname": fullname,
-        "email": email,
-        "dept_id": dept_id
-    }
+@router.post('/',response_model=EmployeeDisplay)
+def create_employee(request : EmployeeBase,db:Session = Depends(get_db)):
+     return db_employee.create_employee(db,request)
 
-    employees.append(employee)
-    return employee
+@router.get('/all',response_model=List[EmployeeDisplay])
+def get_all_employees(db:Session = Depends(get_db)):  
+    return db_employee.get_all_employees(db)   
+
+@router.get('/{emp_id}',response_model=EmployeeDisplay)  
+def get_employees(emp_id:int,db:Session = Depends(get_db)): 
+    return db_employee.get_employees(db,emp_id)  
+
+# @router.post("/{emp_id}", response_model=EmployeeDisplay)
+# def update_employee(
+#     emp_id: int,
+#     request: EmployeeUpdate,
+#     db: Session = Depends(get_db)
+# ):
+#     return db_employee.update_employee(db, emp_id, request)    
+@router.patch("/{emp_id}/update", response_model=EmployeeDisplay)
+def update_employee(emp_id: int, request: EmployeeUpdate, db: Session = Depends(get_db)):
+    return db_employee.update_employee(db, emp_id, request)
 
 
-# GET all employees
-@router.get("/")
-def get_all_employees():
-    return employees
-
-
-# GET employee by ID
-@router.get("/{emp_id}")
-def get_employee(emp_id: int):
-    for emp in employees:
-        if emp["emp_id"] == emp_id:
-            return emp
-
-    raise HTTPException(
-        status_code=404,
-        detail="Employee not found"
-    )
+@router.get("/{emp_id}/delete")
+def delete_employee(emp_id:int,db:Session = Depends(get_db)):
+    return db_employee.delete_employee(db,emp_id)    
