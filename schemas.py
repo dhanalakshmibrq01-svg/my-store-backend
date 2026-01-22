@@ -120,9 +120,11 @@ class UserRoleResponse(BaseModel):
     current_user: UserBase
 
 class EmployeeBase(BaseModel):
+    username:str
+    password:str
     name: str
     phone_no: str
-    user_id: int
+    # user_id: int
     role_id: int
     department_id: int
 
@@ -139,4 +141,8 @@ class EmployeeDisplay(BaseModel):
 
 class EmployeeUpdate(BaseModel):
     name: Optional[str] = None
-    phone_no: Optional[str] = None        
+    phone_no: Optional[str] = None   
+
+class CustomerCreate(BaseModel):
+    username : str
+    password : str         

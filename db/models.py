@@ -42,21 +42,36 @@ class DbProduct(Base):
     category_id = Column(Integer, ForeignKey("category.category_id"))
     category = relationship("DbCategory", back_populates="products")
 
+class SystemRole(Base):
+    __tablename__ = "system_role"
+
+    sr_id = Column(Integer, primary_key=True)       
+    sr_name = Column(String(50), nullable=False, unique=True)
+
+    
+    # users = relationship("DbUser", back_populates="role")
+    user_roles = relationship("UserRole", back_populates="role")
+
 class DbUser(Base):
     __tablename__ = 'login'    
     user_id = Column(Integer,primary_key=True,index=True)
     username = Column(String)
     password = Column(String)
+    sr_id = Column(Integer, nullable=False)
+    # sr_id = Column(Integer, ForeignKey("system_role.sr_id"))
     is_active = Column(String(3), default="YES")
 
-    roles = relationship("UserRole", back_populates="user")
+    # role = relationship("SystemRole", back_populates="users")
+    # roles = relationship("UserRole", back_populates="user")
     employees = relationship("DbEmployee", back_populates="user")
-class SystemRole(Base):
-    __tablename__ = "system_role"
-    sr_id = Column(Integer, primary_key=True)        
-    sr_name = Column(String(50),nullable=False, unique=True)
+    
 
-    users = relationship("UserRole", back_populates="role")
+# class SystemRole(Base):
+#     __tablename__ = "system_role"
+#     sr_id = Column(Integer, primary_key=True)        
+#     sr_name = Column(String(50),nullable=False, unique=True)
+
+#     users = relationship("UserRole", back_populates="role")
 
 class UserRole(Base):
     __tablename__ = "user_role"
@@ -66,8 +81,8 @@ class UserRole(Base):
     sr_id = Column(Integer, ForeignKey("system_role.sr_id"), nullable=False) 
     created_on = Column(DateTime, default=datetime.utcnow) 
     
-    user = relationship("DbUser", back_populates="roles")      
-    role = relationship("SystemRole", back_populates="users")    
+    # user = relationship("DbUser", back_populates="roles")      
+    role = relationship("SystemRole", back_populates="user_roles")    
 
 
 class DbEmployee(Base):

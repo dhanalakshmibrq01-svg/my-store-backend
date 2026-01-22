@@ -1,47 +1,75 @@
 
 # from fastapi import HTTPException,status
 from schemas import EmployeeBase
+from db.hash import Hash
 from db.models import DbEmployee, DbUser, DbRole, DbDepartment
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-def create_employee(db: Session, request: EmployeeBase):
+# def create_employee(db: Session, request: EmployeeBase):
 
-    user = db.query(DbUser).filter(DbUser.user_id == request.user_id).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+#     user = db.query(DbUser).filter(DbUser.user_id == request.user_id).first()
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="User not found"
+#         )
+#     user.sr_id = 2
+#     role = db.query(DbRole).filter(DbRole.role_id == request.role_id).first() 
+#     if not role:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Role not found"
+#         )
 
-    role = db.query(DbRole).filter(DbRole.role_id == request.role_id).first() 
-    if not role:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Role not found"
-        )
+#     department = db.query(DbDepartment).filter(DbDepartment.id == request.department_id).first()
+#     if not department:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Department not found"
+#         )
 
-    department = db.query(DbDepartment).filter(DbDepartment.id == request.department_id).first()
-    if not department:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Department not found"
-        )
-
-    new_employee = DbEmployee(
-        name=request.name,
-        phone_no=request.phone_no,
-        user_id=request.user_id,
-        role_id=request.role_id,
-        department_id=request.department_id  
-    )
+#     new_employee = DbEmployee(
+#         name=request.name,
+#         phone_no=request.phone_no,
+#         user_id=request.user_id,
+#         role_id=request.role_id,
+#         department_id=request.department_id  
+#     )
 
    
-    db.add(new_employee)
-    db.commit()
-    db.refresh(new_employee)
+#     db.add(new_employee)
+#     db.commit()
+#     db.refresh(new_employee)
 
-    return new_employee    
+#     return new_employee    
+def create_employee(db: Session, request: EmployeeCreate):
+
+    
+    user = DbUser(
+        username=request.username,
+        password=Hash.bcrypt(request.password),
+        sr_id=2,
+        is_active = "NO"
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+   
+    employee = DbEmployee(
+        name=request.name,
+        phone_no=request.phone_no,
+        user_id=user.user_id,
+        department_id=request.department_id,
+        role_id=request.role_id
+    )
+    db.add(employee)
+    db.commit()
+
+    return employee
+
+
 
 def get_all_employees(db:Session):
     return db.query(DbEmployee).all()  
