@@ -103,9 +103,10 @@ def get_token(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depe
     
     access_token = token_utils.create_access_token(
         data={
-            "sub": user.username,
+            "username": user.username,
             "user_id": user.user_id,
-            "system_role_id": user.sr_id 
+            
+            "sr_id": user.sr_id 
               }
     )
 
@@ -115,7 +116,7 @@ def get_token(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depe
         "token_type": "bearer",
         "user_id": user.user_id,
         "username": user.username,
-        "system_role_id": user.sr_id,
+        "sr_id": user.sr_id,
         "is_active": "YES"
     }
 

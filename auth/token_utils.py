@@ -23,7 +23,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
   else:
     expire = datetime.utcnow() + timedelta(minutes=15)
   # to_encode.update({"exp": expire})
-  to_encode.update({"exp": int(expire.timestamp())})
+  to_encode.update({"exp": int(expire.timestamp()),"sub": data["username"] })
   encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
   return encoded_jwt
 
@@ -35,7 +35,7 @@ def get_current_user(token:str=Depends(oauth2_schema),db:Session=Depends(get_db)
     )
     try:
       payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
-      username:str=payload.get("sub")
+      username:str=payload.get("username")
 
       if username is None:
         raise credentials_exception

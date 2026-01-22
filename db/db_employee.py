@@ -102,13 +102,32 @@ def update_employee(db: Session, emp_id: int, request: EmployeeUpdate):
 
 
     
-def delete_employee(db:Session,emp_id:int):
-    employee = db.query(DbEmployee).filter(DbEmployee.emp_id == emp_id).first()  
+# def delete_employee(db:Session,emp_id:int):
+#     employee = db.query(DbEmployee).filter(DbEmployee.emp_id == emp_id).first()  
+#     if not employee:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND, 
+#             detail=f"Employee with id={emp_id} not found"
+#         )
+#     db.delete(employee)
+#     db.commit()
+#     return 'ok'       
+
+def delete_employee(db: Session, emp_id: int):
+    employee = db.query(DbEmployee).filter(DbEmployee.emp_id == emp_id).first()
+
     if not employee:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Employee with id={emp_id} not found"
         )
+
+    user = db.query(DbUser).filter(DbUser.user_id == employee.user_id).first()
+
     db.delete(employee)
+
+    if user:
+        db.delete(user)
+
     db.commit()
-    return 'ok'         
+    return {"message": "Employee and login deleted successfully"}
