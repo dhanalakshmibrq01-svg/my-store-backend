@@ -46,4 +46,11 @@ def get_current_user(token:str=Depends(oauth2_schema),db:Session=Depends(get_db)
       
     if user is None:
       raise credentials_exception
+
+    if user.is_active != "YES":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is logged out"
+        )
+  
     return user    
