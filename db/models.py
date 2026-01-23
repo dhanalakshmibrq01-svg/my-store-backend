@@ -2,7 +2,7 @@
 
 from sqlalchemy import Integer,String,Column,Float,DateTime,ForeignKey
 from datetime import datetime
-#from sqlalchemy.sql.schema import ForeignKey
+
 from db.database import Base
 from sqlalchemy.orm import relationship
 
@@ -42,15 +42,6 @@ class DbProduct(Base):
     category_id = Column(Integer, ForeignKey("category.category_id"))
     category = relationship("DbCategory", back_populates="products")
 
-# class SystemRole(Base):
-#     __tablename__ = "system_role"
-
-#     sr_id = Column(Integer, primary_key=True)       
-#     sr_name = Column(String(50), nullable=False, unique=True)
-
-    
-#     # users = relationship("DbUser", back_populates="role")
-#     user_roles = relationship("UserRole", back_populates="role")
 
 class DbUser(Base):
     __tablename__ = 'login'    
@@ -58,33 +49,9 @@ class DbUser(Base):
     username = Column(String)
     password = Column(String)
     sr_id = Column(Integer, nullable=False)
-    # sr_id = Column(Integer, ForeignKey("system_role.sr_id"))
     is_active = Column(String(3), default="YES")
-
-    # role = relationship("SystemRole", back_populates="users")
-    # roles = relationship("UserRole", back_populates="user")
     employees = relationship("DbEmployee", back_populates="user")
     
-
-# class SystemRole(Base):
-#     __tablename__ = "system_role"
-#     sr_id = Column(Integer, primary_key=True)        
-#     sr_name = Column(String(50),nullable=False, unique=True)
-
-#     users = relationship("UserRole", back_populates="role")
-
-# class UserRole(Base):
-#     __tablename__ = "user_role"
-
-#     user_role_id = Column(Integer, primary_key=True, index=True) 
-#     user_id = Column(Integer, ForeignKey("login.user_id"), nullable=False)  
-#     sr_id = Column(Integer, ForeignKey("system_role.sr_id"), nullable=False) 
-#     created_on = Column(DateTime, default=datetime.utcnow) 
-    
-#     # user = relationship("DbUser", back_populates="roles")      
-#     role = relationship("SystemRole", back_populates="user_roles")    
-
-
 class DbEmployee(Base):
     __tablename__ = "employees"
 
