@@ -1,6 +1,6 @@
 
 # from fastapi import HTTPException,status
-from schemas import EmployeeBase
+from schemas import EmployeeBase,EmployeeUpdate
 from db.hash import Hash
 from db.models import DbEmployee, DbUser, DbRole, DbDepartment
 from sqlalchemy.orm import Session
@@ -84,21 +84,64 @@ def get_employees(db:Session,emp_id:int):
     return employee
 
 def update_employee(db: Session, emp_id: int, request: EmployeeUpdate):
+    # employee = db.query(DbEmployee).filter(DbEmployee.emp_id == emp_id).first()
+
+    # if not employee:
+    #     raise HTTPException(status_code=404, detail=f"Employee {emp_id} not found")
+
+    # if request.name is not None:
+    #     employee.name = request.name
+
+    # if request.phone_no is not None:
+    #     employee.phone_no = request.phone_no
+
+    # db.commit()
+    # db.refresh(employee)
+    # return employee
     employee = db.query(DbEmployee).filter(DbEmployee.emp_id == emp_id).first()
-
     if not employee:
-        raise HTTPException(status_code=404, detail=f"Employee {emp_id} not found")
+        raise HTTPException(status_code=404, detail="Employee not found")
 
-    if request.name is not None:
-        employee.name = request.name
+    role = db.query(DbRole).filter(DbRole.role_id == request.role_id).first()
+    if not role:
+        raise HTTPException(status_code=404, detail= "role not found")   
 
-    if request.phone_no is not None:
-        employee.phone_no = request.phone_no
+    department = db.query(DbDepartment).filter(DbDepartment.id == request.dept_id).first()
+    if not department:
+        raise HTTPException(status_code=404, detail= "department not found")    
+    
 
+    employee.name = request.name
+    employee.phone_no = request.phone_no
+    # employee.user_id = request.user_id
+    # product.stock = request.stock
+    # product.image_url = request.image_url
+    employee.role_id = request.role_id
+    employee.department_id = request.dept_id
+
+    
     db.commit()
     db.refresh(employee)
-    return employee
 
+    
+    return {
+        "emp_id": employee.emp_id,
+        "name": employee.name,
+        "phone_no":employee.phone_no,
+         
+        "role": {
+            "role_id": role.role_id,
+            "role_code":role.role_code,
+            "role_name":role.role_name,
+            
+        },
+        "department": {
+            "id": department.id,
+            "code":department.code,
+            "name":department.name,
+            
+        }
+    }
 
 
     

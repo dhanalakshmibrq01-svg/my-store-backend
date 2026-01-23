@@ -1,5 +1,5 @@
 
-from schemas import EmployeeBase,EmployeeDisplay,EmployeeUpdate
+from schemas import EmployeeBase,EmployeeDisplay,EmployeeUpdate,EmployeeUpdateDisplay
 from fastapi import APIRouter,Depends,HTTPException,status
 from sqlalchemy.orm import Session
 from db.database import get_db
@@ -32,11 +32,11 @@ def get_employees(emp_id:int,db:Session = Depends(get_db),current_user=Depends(a
 #     db: Session = Depends(get_db)
 # ):
 #     return db_employee.update_employee(db, emp_id, request)    
-@router.patch("/{emp_id}/update", response_model=EmployeeDisplay)
+@router.post("/{emp_id}/update", response_model=EmployeeUpdateDisplay)
 def update_employee(emp_id: int, request: EmployeeUpdate, db: Session = Depends(get_db),current_user=Depends(admin_only)):
     return db_employee.update_employee(db, emp_id, request)
 
 
-@router.get("/{emp_id}/delete")
+@router.post("/{emp_id}/delete")
 def delete_employee(emp_id:int,db:Session = Depends(get_db),current_user=Depends(admin_only)):
     return db_employee.delete_employee(db,emp_id)    

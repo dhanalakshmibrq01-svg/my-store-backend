@@ -42,15 +42,15 @@ class DbProduct(Base):
     category_id = Column(Integer, ForeignKey("category.category_id"))
     category = relationship("DbCategory", back_populates="products")
 
-class SystemRole(Base):
-    __tablename__ = "system_role"
+# class SystemRole(Base):
+#     __tablename__ = "system_role"
 
-    sr_id = Column(Integer, primary_key=True)       
-    sr_name = Column(String(50), nullable=False, unique=True)
+#     sr_id = Column(Integer, primary_key=True)       
+#     sr_name = Column(String(50), nullable=False, unique=True)
 
     
-    # users = relationship("DbUser", back_populates="role")
-    user_roles = relationship("UserRole", back_populates="role")
+#     # users = relationship("DbUser", back_populates="role")
+#     user_roles = relationship("UserRole", back_populates="role")
 
 class DbUser(Base):
     __tablename__ = 'login'    
@@ -73,16 +73,16 @@ class DbUser(Base):
 
 #     users = relationship("UserRole", back_populates="role")
 
-class UserRole(Base):
-    __tablename__ = "user_role"
+# class UserRole(Base):
+#     __tablename__ = "user_role"
 
-    user_role_id = Column(Integer, primary_key=True, index=True) 
-    user_id = Column(Integer, ForeignKey("login.user_id"), nullable=False)  
-    sr_id = Column(Integer, ForeignKey("system_role.sr_id"), nullable=False) 
-    created_on = Column(DateTime, default=datetime.utcnow) 
+#     user_role_id = Column(Integer, primary_key=True, index=True) 
+#     user_id = Column(Integer, ForeignKey("login.user_id"), nullable=False)  
+#     sr_id = Column(Integer, ForeignKey("system_role.sr_id"), nullable=False) 
+#     created_on = Column(DateTime, default=datetime.utcnow) 
     
-    # user = relationship("DbUser", back_populates="roles")      
-    role = relationship("SystemRole", back_populates="user_roles")    
+#     # user = relationship("DbUser", back_populates="roles")      
+#     role = relationship("SystemRole", back_populates="user_roles")    
 
 
 class DbEmployee(Base):

@@ -94,30 +94,30 @@ class UserDisplay(BaseModel):
     class Config:
         orm_mode = True
 
-class SystemRoleDisplay(BaseModel):
-    sr_id: int
-    sr_name: str
-    class Config:
-        orm_mode = True  
+# class SystemRoleDisplay(BaseModel):
+#     sr_id: int
+#     sr_name: str
+#     class Config:
+#         orm_mode = True  
 
-class UserRoleBase(BaseModel):
-    user_id: int
-    sr_id: int
+# class UserRoleBase(BaseModel):
+#     user_id: int
+#     sr_id: int
 
 
-class UserRoleDisplay(BaseModel):
-    user_role_id: int
-    user: UserDisplay  
-    role: SystemRoleDisplay 
+# class UserRoleDisplay(BaseModel):
+#     user_role_id: int
+#     user: UserDisplay  
+#     role: SystemRoleDisplay 
     
-    created_on: datetime
+#     created_on: datetime
 
-    class Config:
-        orm_mode = True
+#     class Config:
+#         orm_mode = True
 
-class UserRoleResponse(BaseModel):
-    data: List[UserRoleDisplay]
-    current_user: UserBase
+# class UserRoleResponse(BaseModel):
+#     data: List[UserRoleDisplay]
+#     current_user: UserBase
 
 class EmployeeBase(BaseModel):
     username:str
@@ -140,8 +140,20 @@ class EmployeeDisplay(BaseModel):
         orm_mode = True
 
 class EmployeeUpdate(BaseModel):
-    name: Optional[str] = None
-    phone_no: Optional[str] = None   
+    name: str
+    phone_no: int
+    role_id: int
+    dept_id: int 
+      
+class EmployeeUpdateDisplay(BaseModel):
+    emp_id: int
+    name: str
+    phone_no: str
+    role: RoleDisplay
+    department: DepartmentDisplay
+
+    class Config:
+        orm_mode = True
 
 class CustomerCreate(BaseModel):
     username : str

@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI
  #from enum import Enum #from typing import Optional
-from router import employee,department,role,category,product,file,user,system_role,employee,customer
+from router import employee,department,role,category,product,file,user,employee,customer
 from fastapi.staticfiles import StaticFiles 
 from db import models
 from auth import authentication
@@ -19,7 +19,7 @@ def index():
 
 app.include_router(authentication.router)
 app.include_router(user.router)
-app.include_router(system_role.router)
+# app.include_router(system_role.router)
 app.include_router(customer.router)
 app.include_router(file.router)
 app.include_router(employee.router)
