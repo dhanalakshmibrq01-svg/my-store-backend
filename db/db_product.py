@@ -6,12 +6,12 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 def create_product(db: Session, request: ProductBase):
-    # Check if the category exists
+    
     category = db.query(DbCategory).filter(DbCategory.category_id == request.category_id).first()
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     
-    # Create the product
+    
     new_product = DbProduct(
         product_name=request.product_name,
         description=request.description,
@@ -24,34 +24,28 @@ def create_product(db: Session, request: ProductBase):
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
-    # return new_product
-
-    # Attach category object for nested response
-    # new_product.category = category
+   
     return new_product
 
+
 # def search_product_by_name(db: Session, keyword: str):
-#     return db.query(DbProduct).filter(
-#         DbProduct.product_name.ilike(f"%{keyword}%")
+#     keyword = keyword.strip()
+#     if not keyword:
+#         return []
+
+    
+#     starts_with = db.query(DbProduct).filter(
+#         DbProduct.product_name.ilike(f"{keyword}%")
 #     ).all()
-def search_product_by_name(db: Session, keyword: str):
-    keyword = keyword.strip()
-    if not keyword:
-        return []
 
     
-    starts_with = db.query(DbProduct).filter(
-        DbProduct.product_name.ilike(f"{keyword}%")
-    ).all()
+#     contains = db.query(DbProduct).filter(
+#         DbProduct.product_name.ilike(f"%{keyword}%"),
+#         ~DbProduct.product_name.ilike(f"{keyword}%")  
+#     ).all()
 
     
-    contains = db.query(DbProduct).filter(
-        DbProduct.product_name.ilike(f"%{keyword}%"),
-        ~DbProduct.product_name.ilike(f"{keyword}%")  
-    ).all()
-
-    
-    return starts_with + contains
+#     return starts_with + contains
    
 
 def get_all_products(db:Session):
@@ -113,14 +107,38 @@ def delete_product(db:Session,id:int):
     db.commit()
     return 'ok'     
 
-def get_products_by_category(db: Session, category_id: int):
-    category = db.query(DbCategory).filter(DbCategory.category_id == category_id).first()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+# def get_products_by_category(db: Session, category_id: int):
+#     category = db.query(DbCategory).filter(DbCategory.category_id == category_id).first()
+#     if not category:
+#         raise HTTPException(status_code=404, detail="Category not found")
 
-    return db.query(DbProduct).filter(DbProduct.category_id == category_id).all()
+#     return db.query(DbProduct).filter(DbProduct.category_id == category_id).all()
 
 
+
+def search_product(db: Session, keyword: str = "", category_id: int = None):
+    keyword = (keyword or "").strip()
+    query = db.query(DbProduct)
+
+    if category_id:
+        query = query.filter(DbProduct.category_id == category_id)
+
+    if keyword:
+        
+        starts_with = query.filter(DbProduct.product_name.ilike(f"{keyword}%")).all()
+        contains = query.filter(
+            DbProduct.product_name.ilike(f"%{keyword}%"),
+            ~DbProduct.product_name.ilike(f"{keyword}%")
+        ).all()
+        result = starts_with + contains
+    else:
+        result = query.all()
+
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="No products found for this category and keyword")
+
+    return result
 
 
 

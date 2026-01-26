@@ -94,31 +94,6 @@ class UserDisplay(BaseModel):
     class Config:
         orm_mode = True
 
-# class SystemRoleDisplay(BaseModel):
-#     sr_id: int
-#     sr_name: str
-#     class Config:
-#         orm_mode = True  
-
-# class UserRoleBase(BaseModel):
-#     user_id: int
-#     sr_id: int
-
-
-# class UserRoleDisplay(BaseModel):
-#     user_role_id: int
-#     user: UserDisplay  
-#     role: SystemRoleDisplay 
-    
-#     created_on: datetime
-
-#     class Config:
-#         orm_mode = True
-
-# class UserRoleResponse(BaseModel):
-#     data: List[UserRoleDisplay]
-#     current_user: UserBase
-
 class EmployeeBase(BaseModel):
     username:str
     password:str
@@ -144,7 +119,7 @@ class EmployeeUpdate(BaseModel):
     phone_no: int
     role_id: int
     dept_id: int 
-      
+
 class EmployeeUpdateDisplay(BaseModel):
     emp_id: int
     name: str

@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI
  #from enum import Enum #from typing import Optional
-from router import employee,department,role,category,product,file,user,employee,customer
+from router import employee,department,role,category,product,file,employee,customer
 from fastapi.staticfiles import StaticFiles 
 from db import models
 from auth import authentication
@@ -18,7 +18,7 @@ def index():
     return 'product management system'
 
 app.include_router(authentication.router)
-app.include_router(user.router)
+# app.include_router(user.router)
 # app.include_router(system_role.router)
 app.include_router(customer.router)
 app.include_router(file.router)
@@ -39,15 +39,5 @@ def startup_event():
 
 
 
-# origins = [
-#     "http://localhost:3000",  # frontend URL
-# ]
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
 app.mount("/media", StaticFiles(directory="media"), name="media")
