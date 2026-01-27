@@ -90,6 +90,7 @@ class UserBase(BaseModel):
 class UserDisplay(BaseModel):
     user_id: int
     username: str
+    sr_id : int
     is_active: str
     class Config:
         orm_mode = True

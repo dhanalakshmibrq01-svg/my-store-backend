@@ -8,6 +8,7 @@ from db.database import get_db
 from fastapi import HTTPException,status,Depends
 from sqlalchemy.orm import Session
 from db import db_user
+
  
  
 oauth2_schema = OAuth2PasswordBearer(tokenUrl="token")
