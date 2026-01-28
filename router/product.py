@@ -1,6 +1,6 @@
 
 
-from schemas import ProductBase,ProductDisplay,ProductByCategory,CategoryDisplay
+from schemas import ProductBase,ProductDisplay,CategoryDisplay
 from fastapi import APIRouter,Depends,HTTPException,status,Request,Query
 from sqlalchemy.orm import Session
 from db.database import get_db

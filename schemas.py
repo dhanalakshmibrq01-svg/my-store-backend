@@ -34,13 +34,13 @@ class RoleList(BaseModel):
     roles: List[RoleDisplay]    
 
 class CategoryBase(BaseModel):
-    category_code : str
+    # category_code : str
     category_name : str   
     image_url: str
 
 class CategoryDisplay(BaseModel):
     category_id: int
-    category_code: str
+    # category_code: str
     category_name: str
     image_url: str
     class Config():
@@ -69,14 +69,14 @@ class ProductDisplay(BaseModel):
     class Config():
         orm_mode = True
 
-class ProductByCategory(BaseModel):
-    product_id: int
-    product_name: str
-    description: str
-    price: float
-    stock: int
-    image_url: str
-    created_at: datetime
+# class ProductByCategory(BaseModel):
+#     product_id: int
+#     product_name: str
+#     description: str
+#     price: float
+#     stock: int
+#     image_url: str
+#     created_at: datetime
     # category_id: Optional[int]  
 
     class Config:

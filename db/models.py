@@ -23,7 +23,7 @@ class DbRole(Base):
 class DbCategory(Base):
     __tablename__ = 'category'
     category_id = Column(Integer,primary_key=True,index=True)
-    category_code = Column(String)
+    # category_code = Column(String)
     category_name = Column(String)
     image_url = Column(String, nullable=True)
     products = relationship("DbProduct", back_populates="category")

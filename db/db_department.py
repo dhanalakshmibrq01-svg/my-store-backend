@@ -6,6 +6,35 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException,status
 
 def create_dept(db: Session, request: DepartmentBase):
+    if not request.code or not request.code.strip() or request.code.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Department code cannot be empty or default value"
+        )
+
+
+    if not request.name or not request.name.strip() or request.name.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Department name cannot be empty or default value"
+    )
+    
+
+    if db.query(DbDepartment).filter(
+        DbDepartment.code.ilike(request.code.strip())).first():
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Department code already exists"
+    )
+
+
+    if db.query(DbDepartment).filter(
+       DbDepartment.name.ilike(request.name.strip())).first():
+       raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Department name already exists"
+    )
+
     new_dept = DbDepartment(
         code=request.code,
         name = request.name
@@ -35,7 +64,18 @@ def update_dept(db: Session, id: int, request: DepartmentBase):
             status_code=status.HTTP_404_NOT_FOUND, 
             detail=f"Department with id={id} not found"
         )
+    if not request.code or not request.code.strip() or request.code.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Department code cannot be empty or default value"
+        )
 
+    
+    if not request.name or not request.name.strip() or request.name.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Department name cannot be empty or default value"
+        )    
     
     dept.code = request.code
     dept.name = request.name

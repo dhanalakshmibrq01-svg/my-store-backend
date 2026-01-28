@@ -1,12 +1,24 @@
 
 from schemas import CategoryBase
-from db.models import DbCategory
+from db.models import DbCategory,DbProduct
 from sqlalchemy.orm import Session
 from fastapi import HTTPException,status
 
 def create_category(db: Session, request: CategoryBase):
+    
+    if not request.category_name or not request.category_name.strip() or request.category_name.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Category name cannot be empty or default value"
+    )
+    if db.query(DbCategory).filter(
+        DbCategory.category_name.ilike(request.category_name.strip())).first():
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Category name already exists"
+    )
     new_category = DbCategory(
-        category_code=request.category_code,
+       
         category_name = request.category_name,
         image_url=request.image_url
     )
@@ -35,7 +47,13 @@ def update_category(db: Session, id: int, request: CategoryBase):
             status_code=status.HTTP_404_NOT_FOUND, 
             detail=f"Category with id={id} not found"
         )
-    category.category_code = request.category_code
+
+    if not request.category_name or not request.category_name.strip() or request.category_name.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="category name cannot be empty or default value"
+        )        
+    # category.category_code = request.category_code
     category.category_name = request.category_name
     category.image_url = request.image_url
     db.commit()
@@ -43,7 +61,7 @@ def update_category(db: Session, id: int, request: CategoryBase):
 
     return {
         "category_id": category.category_id,
-        "category_code": category.category_code,
+        # "category_code": category.category_code,
         "category_name": category.category_name,
         "image_url": category.image_url
     }
@@ -55,6 +73,15 @@ def delete_category(db:Session,id:int):
             status_code=status.HTTP_404_NOT_FOUND, 
             detail=f"Category with id={id} not found"
         )
+    product_count = db.query(DbProduct).filter(
+        DbProduct.category_id == id).count()
+
+    if product_count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This category has products. Move or delete them first."
+        )
+    
     db.delete(category)
     db.commit()
     return 'ok' 

@@ -6,6 +6,33 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException,status
 
 def create_role(db: Session, request: RoleBase):
+    if not request.role_code or not request.role_code.strip() or request.role_code.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role code cannot be empty or default value"
+        )
+
+
+    if not request.role_name or not request.role_name.strip() or request.role_name.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role name cannot be empty or default value"
+    )
+    if db.query(DbRole).filter(
+        DbRole.role_code.ilike(request.role_code.strip())).first():
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Role code already exists"
+    )
+
+
+    if db.query(DbRole).filter(
+       DbRole.role_name.ilike(request.role_name.strip())).first():
+       raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Role name already exists"
+    )
+
     new_role = DbRole(
         role_code=request.role_code,
         role_name = request.role_name
@@ -34,6 +61,18 @@ def update_role(db: Session, id: int, request: RoleBase):
             status_code=status.HTTP_404_NOT_FOUND, 
             detail=f"Role with id={id} not found"
         )
+    if not request.role_code or not request.role_code.strip() or request.role_code.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role code cannot be empty or default value"
+        )
+
+    
+    if not request.role_name or not request.role_name.strip() or request.role_name.strip().lower() == "string":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role name cannot be empty or default value"
+        )    
     role.role_code = request.role_code
     role.role_name = request.role_name
 

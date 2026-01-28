@@ -6,11 +6,47 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 def create_product(db: Session, request: ProductBase):
-    
+    fields = {
+        "Product name": request.product_name,
+        "Description": request.description,
+        "Image URL": request.image_url
+    }
+
+    for field_name, value in fields.items():
+        if not value or not value.strip() or value.strip().lower() == "string":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"{field_name} cannot be empty or default value"
+            )
+
+    if request.price is None or request.price <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Price must be greater than 0"
+        )
+
+    if request.stock is None or request.stock < 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Stock cannot be negative"
+        )
+
+    if not request.category_id or request.category_id <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Category is required"
+        )
+        
     category = db.query(DbCategory).filter(DbCategory.category_id == request.category_id).first()
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    
+
+    if db.query(DbProduct).filter(
+        DbProduct.product_name.ilike(request.product_name.strip())).first():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Product name already exists"
+    )
     
     new_product = DbProduct(
         product_name=request.product_name,
@@ -91,7 +127,7 @@ def update_product(db: Session, id: int, request: ProductBase):
         "created_at": product.created_at,
         "category": {
             "category_id": category.category_id,
-            "category_code":category.category_code,
+            
             "category_name":category.category_name,
             "image_url":category.image_url
         }
