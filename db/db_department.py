@@ -1,11 +1,15 @@
 
 
 from schemas import DepartmentBase
-from db.models import DbDepartment
+from db.models import DbDepartment,DbEmployee
 from sqlalchemy.orm import Session
 from fastapi import HTTPException,status
+from utils.string_utils import normalize_string
 
 def create_dept(db: Session, request: DepartmentBase):
+    # def normalize_string(value: str) -> str:
+    #    return "".join(value.split()).lower()
+
     if not request.code or not request.code.strip() or request.code.strip().lower() == "string":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -19,22 +23,24 @@ def create_dept(db: Session, request: DepartmentBase):
             detail="Department name cannot be empty or default value"
     )
     
+    normalized_code = normalize_string(request.code)
+    normalized_name = normalize_string(request.name)
 
-    if db.query(DbDepartment).filter(
-        DbDepartment.code.ilike(request.code.strip())).first():
-        raise HTTPException(
+
+    if db.query(DbDepartment).filter(DbDepartment.code.ilike(normalized_code)).first():
+       raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
         detail="Department code already exists"
     )
 
 
-    if db.query(DbDepartment).filter(
-       DbDepartment.name.ilike(request.name.strip())).first():
-       raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Department name already exists"
-    )
-
+    existing_departments = db.query(DbDepartment).all()
+    for dept in existing_departments:
+       if normalize_string(dept.name) == normalized_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Department name already exists"
+        )
     new_dept = DbDepartment(
         code=request.code,
         name = request.name
@@ -76,6 +82,25 @@ def update_dept(db: Session, id: int, request: DepartmentBase):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Department name cannot be empty or default value"
         )    
+
+    normalized_code = normalize_string(request.code)
+    normalized_name = normalize_string(request.name)
+
+
+    if db.query(DbDepartment).filter(DbDepartment.code.ilike(normalized_code)).first():
+       raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Department code already exists"
+    )
+
+
+    existing_departments = db.query(DbDepartment).all()
+    for dept in existing_departments:
+       if normalize_string(dept.name) == normalized_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Department name already exists"
+        )    
     
     dept.code = request.code
     dept.name = request.name
@@ -98,6 +123,14 @@ def delete_dept(db:Session,id:int):
             status_code=status.HTTP_404_NOT_FOUND, 
             detail=f"Department with id={id} not found"
         )
+    employee_count = db.query(DbEmployee).filter(
+        DbEmployee.department_id == id).count()
+
+    if employee_count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This department has employees. Move or delete them first."
+        )        
     db.delete(dept)
     db.commit()
     return 'ok' 

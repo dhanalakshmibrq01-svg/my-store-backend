@@ -3,20 +3,32 @@ from schemas import CategoryBase
 from db.models import DbCategory,DbProduct
 from sqlalchemy.orm import Session
 from fastapi import HTTPException,status
+from utils.string_utils import normalize_string
 
 def create_category(db: Session, request: CategoryBase):
-    
+    # def normalize_string(value: str) -> str:
+    #    return "".join(value.split()).lower()
+
     if not request.category_name or not request.category_name.strip() or request.category_name.strip().lower() == "string":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Category name cannot be empty or default value"
     )
-    if db.query(DbCategory).filter(
-        DbCategory.category_name.ilike(request.category_name.strip())).first():
+
+    normalized_name = normalize_string(request.category_name)
+    # if db.query(DbCategory).filter(
+    #     DbCategory.category_name.ilike(request.category_name.strip())).first():
+    #     raise HTTPException(
+    #     status_code=status.HTTP_400_BAD_REQUEST,
+    #     detail="Category name already exists"
+    # )
+    existing_categories = db.query(DbCategory).all()
+    for category in existing_categories:
+       if normalize_string(category.category_name) == normalized_name:
         raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Category name already exists"
-    )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Category name already exists"
+        )
     new_category = DbCategory(
        
         category_name = request.category_name,
@@ -41,6 +53,9 @@ def get_category(db:Session,id:int):
 
 
 def update_category(db: Session, id: int, request: CategoryBase):
+    # def normalize_string(value: str) -> str:
+    #     return "".join(value.split()).lower()
+
     category = db.query(DbCategory).filter(DbCategory.category_id == id).first()
     if not category:
         raise HTTPException(
@@ -53,7 +68,18 @@ def update_category(db: Session, id: int, request: CategoryBase):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="category name cannot be empty or default value"
         )        
-    # category.category_code = request.category_code
+    normalized_name = normalize_string(request.category_name)
+
+    
+    existing_categories = db.query(DbCategory).all()
+    for category in existing_categories:
+       if normalize_string(category.category_name) == normalized_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Category name already exists"
+        )
+
+
     category.category_name = request.category_name
     category.image_url = request.image_url
     db.commit()
@@ -61,7 +87,7 @@ def update_category(db: Session, id: int, request: CategoryBase):
 
     return {
         "category_id": category.category_id,
-        # "category_code": category.category_code,
+       
         "category_name": category.category_name,
         "image_url": category.image_url
     }

@@ -4,49 +4,12 @@ from schemas import ProductBase, ProductDisplay
 from db.models import DbProduct, DbCategory
 from sqlalchemy.orm import Session
 from datetime import datetime
+from utils.product_validation import validate_product
+
 
 def create_product(db: Session, request: ProductBase):
-    fields = {
-        "Product name": request.product_name,
-        "Description": request.description,
-        "Image URL": request.image_url
-    }
-
-    for field_name, value in fields.items():
-        if not value or not value.strip() or value.strip().lower() == "string":
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"{field_name} cannot be empty or default value"
-            )
-
-    if request.price is None or request.price <= 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Price must be greater than 0"
-        )
-
-    if request.stock is None or request.stock < 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Stock cannot be negative"
-        )
-
-    if not request.category_id or request.category_id <= 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Category is required"
-        )
-        
-    category = db.query(DbCategory).filter(DbCategory.category_id == request.category_id).first()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-
-    if db.query(DbProduct).filter(
-        DbProduct.product_name.ilike(request.product_name.strip())).first():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Product name already exists"
-    )
+    validate_product(db, request)
+    
     
     new_product = DbProduct(
         product_name=request.product_name,
@@ -62,6 +25,7 @@ def create_product(db: Session, request: ProductBase):
     db.refresh(new_product)
    
     return new_product
+
 
 
 # def search_product_by_name(db: Session, keyword: str):
@@ -97,14 +61,16 @@ def get_product(db:Session,id:int):
     return product
 
 def update_product(db: Session, id: int, request: ProductBase):
+    
     product = db.query(DbProduct).filter(DbProduct.product_id == id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    category = db.query(DbCategory).filter(DbCategory.category_id == request.category_id).first()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")    
-
+    # category = db.query(DbCategory).filter(DbCategory.category_id == request.category_id).first()
+    # if not category:
+    #     raise HTTPException(status_code=404, detail="Category not found")
+    validate_product(db, request, product_id=id)
+    
     product.product_name = request.product_name
     product.description = request.description
     product.price = request.price
@@ -115,6 +81,7 @@ def update_product(db: Session, id: int, request: ProductBase):
     
     db.commit()
     db.refresh(product)
+    category = db.query(DbCategory).filter(DbCategory.category_id == product.category_id).first()
 
     
     return {
