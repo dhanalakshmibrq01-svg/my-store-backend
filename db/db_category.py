@@ -71,14 +71,23 @@ def update_category(db: Session, id: int, request: CategoryBase):
     normalized_name = normalize_string(request.category_name)
 
     
+    # existing_categories = db.query(DbCategory).all()
+    # for category in existing_categories:
+    #    if normalize_string(category.category_name) == normalized_name:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Category name already exists"
+    #     )
     existing_categories = db.query(DbCategory).all()
-    for category in existing_categories:
-       if normalize_string(category.category_name) == normalized_name:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Category name already exists"
-        )
+    for d in existing_categories:
+        if d.category_id == id:
+            continue
 
+        if normalize_string(d.category_name) == normalized_name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Category name already exists"
+            )
 
     category.category_name = request.category_name
     category.image_url = request.image_url

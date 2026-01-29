@@ -85,21 +85,42 @@ def update_role(db: Session, id: int, request: RoleBase):
     normalized_code = normalize_string(request.role_code)
     normalized_name = normalize_string(request.role_name)
 
+    existing_code = db.query(DbRole).filter(
+        DbRole.role_id != id,
+        DbRole.role_code.ilike(request.role_code.strip())
+    ).first()
 
-    if db.query(DbRole).filter(DbRole.role_code.ilike(normalized_code)).first():
-       raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Role code already exists"
-    )
-
-
-    existing_roles = db.query(DbRole).all()
-    for role in existing_roles:
-       if normalize_string(role.role_name) == normalized_name:
+    if existing_code:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Role name already exists"
-        )       
+            detail="Role code already exists"
+        )
+
+    
+    existing_roles = db.query(DbRole).all()
+    for d in existing_roles:
+        if d.role_id == id:
+            continue
+
+        if normalize_string(d.role_name) == normalized_name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Role name already exists"
+            )
+    # if db.query(DbRole).filter(DbRole.role_code.ilike(normalized_code)).first():
+    #    raise HTTPException(
+    #     status_code=status.HTTP_400_BAD_REQUEST,
+    #     detail="Role code already exists"
+    # )
+
+
+    # existing_roles = db.query(DbRole).all()
+    # for role in existing_roles:
+    #    if normalize_string(role.role_name) == normalized_name:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Role name already exists"
+    #     )       
     role.role_code = request.role_code
     role.role_name = request.role_name
 

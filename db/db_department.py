@@ -87,21 +87,37 @@ def update_dept(db: Session, id: int, request: DepartmentBase):
     normalized_name = normalize_string(request.name)
 
 
-    if db.query(DbDepartment).filter(DbDepartment.code.ilike(normalized_code)).first():
-       raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Department code already exists"
-    )
+    # if db.query(DbDepartment).filter(DbDepartment.code.ilike(normalized_code)).first(): raise HTTPException( status_code=status.HTTP_400_BAD_REQUEST, detail="Department code already exists" ) 
+    # existing_departments = db.query(DbDepartment).all()
+    #  for dept in existing_departments: 
+    #     if normalize_string(dept.name) == normalized_name: 
+    #         raise HTTPException( status_code=status.HTTP_400_BAD_REQUEST, detail="Department name already exists" )
+    
+    existing_code = db.query(DbDepartment).filter(
+        DbDepartment.id != id,
+        DbDepartment.code.ilike(request.code.strip())
+    ).first()
 
-
-    existing_departments = db.query(DbDepartment).all()
-    for dept in existing_departments:
-       if normalize_string(dept.name) == normalized_name:
+    if existing_code:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Department name already exists"
-        )    
+            detail="Department code already exists"
+        )
+
     
+    existing_departments = db.query(DbDepartment).all()
+    for d in existing_departments:
+        if d.id == id:
+            continue
+
+        if normalize_string(d.name) == normalized_name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Department name already exists"
+            )
+
+
+
     dept.code = request.code
     dept.name = request.name
     
