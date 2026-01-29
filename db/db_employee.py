@@ -9,6 +9,15 @@ from fastapi import HTTPException, status
 
    
 def create_employee(db: Session, request: EmployeeCreate):
+#     existing_phone = db.query(DbEmployee).filter(
+#     DbEmployee.phone_no == request.phone_no
+# ).first()
+
+#     if existing_phone:
+#         raise HTTPException(
+#           status_code=400,
+#           detail="Phone number already exists"
+#     )
 
     
     user = DbUser(

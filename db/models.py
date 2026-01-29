@@ -23,7 +23,7 @@ class DbRole(Base):
 class DbCategory(Base):
     __tablename__ = 'category'
     category_id = Column(Integer,primary_key=True,index=True)
-    # category_code = Column(String)
+    
     category_name = Column(String)
     image_url = Column(String, nullable=True)
     products = relationship("DbProduct", back_populates="category")
@@ -46,7 +46,7 @@ class DbProduct(Base):
 class DbUser(Base):
     __tablename__ = 'login'    
     user_id = Column(Integer,primary_key=True,index=True)
-    username = Column(String)
+    username = Column(String(100), unique=True, nullable=False)
     password = Column(String)
     sr_id = Column(Integer, nullable=False)
     is_active = Column(String(3), default="YES")
@@ -58,7 +58,7 @@ class DbEmployee(Base):
     emp_id = Column(Integer, primary_key=True, index=True)
 
     name = Column(String, nullable=False)
-    phone_no = Column(String, nullable=False)
+    phone_no = Column(String(15), unique=True, nullable=False)
     
     user_id = Column(Integer, ForeignKey("login.user_id"), nullable=False)
     role_id = Column(Integer, ForeignKey("role.role_id"), nullable=False)

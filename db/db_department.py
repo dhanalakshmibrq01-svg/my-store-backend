@@ -86,29 +86,27 @@ def update_dept(db: Session, id: int, request: DepartmentBase):
     normalized_code = normalize_string(request.code)
     normalized_name = normalize_string(request.name)
 
-
-    # if db.query(DbDepartment).filter(DbDepartment.code.ilike(normalized_code)).first(): raise HTTPException( status_code=status.HTTP_400_BAD_REQUEST, detail="Department code already exists" ) 
-    # existing_departments = db.query(DbDepartment).all()
-    #  for dept in existing_departments: 
-    #     if normalize_string(dept.name) == normalized_name: 
-    #         raise HTTPException( status_code=status.HTTP_400_BAD_REQUEST, detail="Department name already exists" )
     
-    existing_code = db.query(DbDepartment).filter(
-        DbDepartment.id != id,
-        DbDepartment.code.ilike(request.code.strip())
-    ).first()
-
-    if existing_code:
+    if normalize_string(dept.code) == normalized_code and dept.code != request.code:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Department code already exists"
         )
 
-    
-    existing_departments = db.query(DbDepartment).all()
+    if normalize_string(dept.name) == normalized_name and dept.name != request.name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Department name already exists"
+        )
+
+    existing_departments = db.query(DbDepartment).filter(DbDepartment.id != id).all()
+
     for d in existing_departments:
-        if d.id == id:
-            continue
+        if normalize_string(d.code) == normalized_code:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Department code already exists"
+            )
 
         if normalize_string(d.name) == normalized_name:
             raise HTTPException(
@@ -116,11 +114,9 @@ def update_dept(db: Session, id: int, request: DepartmentBase):
                 detail="Department name already exists"
             )
 
-
-
+   
     dept.code = request.code
     dept.name = request.name
-    
     db.commit() 
     db.refresh(dept)  
 
